@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:audioplayers/audioplayers.dart';
-import 'dart:ui';
 
 void main() {
   runApp(MyApp());
@@ -29,46 +27,13 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class TextPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize:
-            Size.fromHeight(kToolbarHeight), // Taille standard de la AppBar
-        child: AppBar(
-          backgroundColor: _buildGradientDecoration().color,
-          elevation: 0,
-          flexibleSpace: Container(
-            decoration: _buildGradientDecoration(),
-          ),
-          title: Container(
-            height: 60.0,
-            alignment: Alignment.center,
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text(
-          'Le projet darrêté, émanant des services du secrétaire dEtat à la Mer Hervé Berville, affirme que les systèmes de caméras "sont susceptibles dapporter une contribution significative" à la lutte contre les captures accidentelles. "La visibilité apportée aux professionnels de la pêche sur plusieurs années est un facteur déterminant de leur engagement à s’équiper en dispositifs techniques de sélectivité", estime le texte.Le projet darrêté, émanant des services du secrétaire dEtat à la Mer Hervé Berville, affirme que les systèmes de caméras "sont susceptibles dapporter une contribution significative" à la lutte contre les captures accidentelles. "La visibilité apportée aux professionnels de la pêche sur plusieurs années est un facteur déterminant de leur engagement à séquiper en dispositifs techniques ou en système dobservation électronique à distance", justifie encore le texte dans son préambule. La période de fermeture envisagée ne concerne pas le golfe du Morbihan ni le bassin dArcachon.Le projet darrêté, émanant des services du secrétaire dEtat',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 16.0,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 170, 117, 190),
-        elevation: 0, // Aucune ombre
+        elevation: 0,
         title: Center(
           child: Container(
             height: 60.0,
@@ -78,7 +43,7 @@ class MyHomePage extends StatelessWidget {
         ),
       ),
       body: Container(
-        decoration: _buildGradientDecoration(), // Utilisez le dégradé ici
+        decoration: _buildGradientDecoration(),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -87,8 +52,8 @@ class MyHomePage extends StatelessWidget {
                 tag: 'hero',
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple[300], // Couleur du bouton
-                    foregroundColor: Colors.white, // Couleur du texte du bouton
+                    backgroundColor: Colors.purple[300],
+                    foregroundColor: Colors.white,
                   ),
                   child: Text('Focus!'),
                   onPressed: () {
@@ -99,17 +64,31 @@ class MyHomePage extends StatelessWidget {
                   },
                 ),
               ),
-              SizedBox(height: 20), // Ajoute un espace entre les boutons
+              SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[300], // Couleur du bouton pour Paint
-                  foregroundColor: Colors.white, // Couleur du texte du bouton
+                  backgroundColor: Colors.blue[300],
+                  foregroundColor: Colors.white,
                 ),
                 child: Text('Go to Paint'),
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => PaintScreen()), // Naviguer vers la page Paint
+                    MaterialPageRoute(builder: (context) => PaintScreen()),
+                  );
+                },
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green[300],
+                  foregroundColor: Colors.white,
+                ),
+                child: Text('Go to Loading Page'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoadingPage()),
                   );
                 },
               ),
@@ -118,7 +97,7 @@ class MyHomePage extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed, // Fixe le bar
+        type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.purple[300],
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.purple[100],
@@ -141,29 +120,86 @@ class MyHomePage extends StatelessWidget {
   }
 }
 
-class MyPainter extends CustomPainter {
-  List<Offset?> points; // Allow null values in the points list
+class LoadingPage extends StatefulWidget {
+  @override
+  _LoadingPageState createState() => _LoadingPageState();
+}
 
-  MyPainter({required this.points});
+class _LoadingPageState extends State<LoadingPage> with WidgetsBindingObserver {
+  bool _showFocusMessage = false;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    var paint = Paint()
-      ..color = Colors.red
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 12.0;
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+  }
 
-    for (int i = 0; i < points.length - 1; i++) {
-      if (points[i] != null && points[i + 1] != null) {
-        canvas.drawLine(points[i]!, points[i + 1]!, paint); // Use ! to assert that the value is not null
-      }
+  @override
+  void dispose() {
+    WidgetsBinding.instance!.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      setState(() {
+        _showFocusMessage = true;
+      });
     }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            CircularProgressIndicator(),
+            SizedBox(height: 20),
+            if (_showFocusMessage)
+              Text('FOCUS!',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
+class TextPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: AppBar(
+          backgroundColor: _buildGradientDecoration().color,
+          elevation: 0,
+          flexibleSpace: Container(
+            decoration: _buildGradientDecoration(),
+          ),
+          title: Container(
+            height: 60.0,
+            alignment: Alignment.center,
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Text(
+          'Le projet darrêté, émanant des services du secrétaire dEtat à la Mer Hervé Berville, affirme que les systèmes de caméras "sont susceptibles dapporter une contribution significative" à la lutte contre les captures accidentelles...',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 16.0,
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class PaintScreen extends StatefulWidget {
   @override
@@ -180,16 +216,14 @@ class _PaintScreenState extends State<PaintScreen> {
         title: Text('Paint on Image'),
       ),
       body: Stack(
-        alignment: Alignment.center, // Center the image
+        alignment: Alignment.center,
         children: <Widget>[
-          // Image Layer
           Image.asset(
             'assets/images/sapin.jpg',
-            fit: BoxFit.cover, // This ensures the image covers the screen, adjust as needed
-            width: 600, // Stretch to the full width
-            height: 600, // Stretch to the full height
+            fit: BoxFit.cover,
+            width: 600,
+            height: 600,
           ),
-          // Painting Canvas Layer
           GestureDetector(
             onPanUpdate: (details) {
               setState(() {
@@ -213,3 +247,25 @@ class _PaintScreenState extends State<PaintScreen> {
   }
 }
 
+class MyPainter extends CustomPainter {
+  List<Offset?> points;
+
+  MyPainter({required this.points});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()
+      ..color = Colors.red
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 12.0;
+
+    for (int i = 0; i < points.length - 1; i++) {
+      if (points[i] != null && points[i + 1] != null) {
+        canvas.drawLine(points[i]!, points[i + 1]!, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
