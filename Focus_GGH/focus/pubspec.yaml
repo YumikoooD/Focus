@@ -60,7 +60,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-      - assets/images/Logo_Focus.png
+    - assets/images/Logo_Focus.png
+    - assets/sound/twitter.mp3
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -21,7 +21,7 @@ class _MyWidgetState extends State<MyWidget> {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        playSound('sound/twitter.mp3');
+        playSound('assets/audio/twitter.mp3');
       },
       child: Text('Play Sound'),
     );
@@ -89,7 +89,7 @@ class MyHomePage extends StatelessWidget {
 
   Future<void> playSound() async {
     try {
-      await audioPlayer.play(AssetSource('sound/twitter.mp3'));
+      await audioPlayer.play(AssetSource('/audio/twitter.mp3'));
     } catch (e) {
       // Gérer l'erreur si nécessaire
       print("Erreur lors de la lecture du son: $e");
@@ -100,23 +100,17 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 170, 117, 190),
-        elevation: 0, // Aucune ombre
-        title: Center(
-          child: Container(
-            height: 60.0,
+          // Configuration de votre AppBar...
           ),
-        ),
-      ),
       body: Container(
-        decoration: _buildGradientDecoration(), // Utilisez le dégradé ici
+        // Configuration de votre Body...
         child: Center(
           child: Hero(
             tag: 'hero',
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple[300], // Couleur du bouton
-                foregroundColor: Colors.white, // Couleur du texte du bouton
+                backgroundColor: Colors.purple[300],
+                foregroundColor: Colors.white,
               ),
               child: Text('Focus!'),
               onPressed: () {
@@ -130,26 +124,7 @@ class MyHomePage extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed, // Fixe le bar
-        backgroundColor: Colors.purple[300],
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.purple[100],
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.school),
-            label: 'School',
-          ),
-        ],
-      ),
+      // Configuration de votre BottomNavigationBar...
     );
   }
 }
