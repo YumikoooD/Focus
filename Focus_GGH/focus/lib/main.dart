@@ -1,47 +1,9 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
+import 'dart:ui';
 
 void main() {
   runApp(MyApp());
-}
-
-class MyWidget extends StatefulWidget {
-  @override
-  _MyWidgetState createState() => _MyWidgetState();
-}
-
-class _MyWidgetState extends State<MyWidget> {
-  final audioPlayer = AudioPlayer();
-  Timer? timer;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
-
-  Future<void> playSound(String path) async {
-    timer?.cancel();
-    timer = Timer.periodic(Duration(seconds: 5), (Timer t) async {
-      await audioPlayer.play(AssetSource(path));
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        playSound('sound/twitter.mp3');
-      },
-      child: Text('Play Sound'),
-    );
-  }
 }
 
 BoxDecoration _buildGradientDecoration() {
@@ -100,33 +62,7 @@ class TextPage extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final audioPlayer = AudioPlayer();
-  Timer? timer;
-
-  Future<void> playSound() async {
-    try {
-      timer?.cancel();
-      timer = Timer.periodic(Duration(seconds: 5), (Timer t) async {
-        await audioPlayer.play(AssetSource('sound/twitter.mp3'));
-      });
-    } catch (e) {
-      // Gérer l'erreur si nécessaire
-      print("Erreur lors de la lecture du son: $e");
-    }
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
-
+class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,28 +72,48 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Center(
           child: Container(
             height: 60.0,
+            child: Image.asset('assets/images/Logo_Focus.png',
+                fit: BoxFit.contain),
           ),
         ),
       ),
       body: Container(
         decoration: _buildGradientDecoration(), // Utilisez le dégradé ici
         child: Center(
-          child: Hero(
-            tag: 'hero',
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple[300], // Couleur du bouton
-                foregroundColor: Colors.white, // Couleur du texte du bouton
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Hero(
+                tag: 'hero',
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple[300], // Couleur du bouton
+                    foregroundColor: Colors.white, // Couleur du texte du bouton
+                  ),
+                  child: Text('Focus!'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => TextPage()),
+                    );
+                  },
+                ),
               ),
-              child: Text('Focus!'),
-              onPressed: () {
-                playSound(); // Jouer le son
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => TextPage()),
-                );
-              },
-            ),
+              SizedBox(height: 20), // Ajoute un espace entre les boutons
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[300], // Couleur du bouton pour Paint
+                  foregroundColor: Colors.white, // Couleur du texte du bouton
+                ),
+                child: Text('Go to Paint'),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PaintScreen()), // Naviguer vers la page Paint
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),
@@ -184,3 +140,76 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+
+class MyPainter extends CustomPainter {
+  List<Offset?> points; // Allow null values in the points list
+
+  MyPainter({required this.points});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()
+      ..color = Colors.red
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 12.0;
+
+    for (int i = 0; i < points.length - 1; i++) {
+      if (points[i] != null && points[i + 1] != null) {
+        canvas.drawLine(points[i]!, points[i + 1]!, paint); // Use ! to assert that the value is not null
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+
+class PaintScreen extends StatefulWidget {
+  @override
+  _PaintScreenState createState() => _PaintScreenState();
+}
+
+class _PaintScreenState extends State<PaintScreen> {
+  List<Offset?> points = [];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Paint on Image'),
+      ),
+      body: Stack(
+        alignment: Alignment.center, // Center the image
+        children: <Widget>[
+          // Image Layer
+          Image.asset(
+            'assets/images/sapin.jpg',
+            fit: BoxFit.cover, // This ensures the image covers the screen, adjust as needed
+            width: 600, // Stretch to the full width
+            height: 600, // Stretch to the full height
+          ),
+          // Painting Canvas Layer
+          GestureDetector(
+            onPanUpdate: (details) {
+              setState(() {
+                RenderBox renderBox = context.findRenderObject() as RenderBox;
+                points.add(renderBox.globalToLocal(details.localPosition));
+              });
+            },
+            onPanEnd: (details) {
+              setState(() {
+                points.add(null);
+              });
+            },
+            child: CustomPaint(
+              painter: MyPainter(points: points),
+              child: Container(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
