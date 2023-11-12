@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:audioplayers/audioplayers.dart';
 import 'dart:ui';
 
 void main() {
@@ -172,6 +171,30 @@ class PaintScreen extends StatefulWidget {
 
 class _PaintScreenState extends State<PaintScreen> {
   List<Offset?> points = [];
+  double starOpacity = 0.0; // Opacity variable for the star image
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduleImageAppearance();
+  }
+
+  void _scheduleImageAppearance() {
+    // Show the image after 5 seconds
+    Future.delayed(Duration(seconds: 5), () {
+      setState(() {
+        starOpacity = 1.0; // Fade in the image
+      });
+
+      // Hide the image after an additional 3 seconds
+      Future.delayed(Duration(seconds: 3), () {
+        setState(() {
+          starOpacity = 0.0; // Fade out the image
+        });
+      });
+    });
+  }
+  // ... vos autres déclarations de variables et fonctions ...
 
   @override
   Widget build(BuildContext context) {
@@ -180,16 +203,31 @@ class _PaintScreenState extends State<PaintScreen> {
         title: Text('Paint on Image'),
       ),
       body: Stack(
-        alignment: Alignment.center, // Center the image
+        alignment: Alignment.center,
         children: <Widget>[
-          // Image Layer
+          // Image de fond
           Image.asset(
             'assets/images/sapin.jpg',
-            fit: BoxFit.cover, // This ensures the image covers the screen, adjust as needed
-            width: 600, // Stretch to the full width
-            height: 600, // Stretch to the full height
+            fit: BoxFit.cover,
+            width: 600,
+            height: 600,
           ),
-          // Painting Canvas Layer
+          // Image animée (avec IgnorePointer)
+          Positioned(
+            child: IgnorePointer(
+              child: AnimatedOpacity(
+                opacity: starOpacity,
+                duration: Duration(seconds: 1),
+                child: Image.asset(
+                  'assets/images/insta.jpg',
+                  alignment: Alignment(0, -1),
+                  width: 800,
+                  height: 800,
+                ),
+              ),
+            ),
+          ),
+          // CustomPaint et GestureDetector pour le dessin
           GestureDetector(
             onPanUpdate: (details) {
               setState(() {
