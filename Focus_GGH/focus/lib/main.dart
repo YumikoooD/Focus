@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'dart:async';
 
 void main() {
   runApp(MyApp());
@@ -28,13 +29,54 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class TextPage extends StatelessWidget {
+class TextPage extends StatefulWidget {
+  @override
+  _TextPageState createState() => _TextPageState();
+}
+
+class _TextPageState extends State<TextPage> {
+  Timer? _timer;
+  int _start = 45;
+
+  void startTimer() {
+    const oneSec = Duration(seconds: 1);
+    _timer = Timer.periodic(
+      oneSec,
+      (Timer timer) {
+        if (_start == 0) {
+          setState(() {
+            timer.cancel();
+          });
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => QCMPage()), // Redirect to NewPage
+          );
+        } else {
+          setState(() {
+            _start--;
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize:
-            Size.fromHeight(kToolbarHeight), // Taille standard de la AppBar
+        preferredSize: Size.fromHeight(kToolbarHeight),
         child: AppBar(
           backgroundColor: _buildGradientDecoration().color,
           elevation: 0,
@@ -44,17 +86,47 @@ class TextPage extends StatelessWidget {
           title: Container(
             height: 60.0,
             alignment: Alignment.center,
+            child: Text('Timer: $_start'), // Display the countdown timer
           ),
         ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Text(
-          'Le projet darrêté, émanant des services du secrétaire dEtat à la Mer Hervé Berville, affirme que les systèmes de caméras "sont susceptibles dapporter une contribution significative" à la lutte contre les captures accidentelles. "La visibilité apportée aux professionnels de la pêche sur plusieurs années est un facteur déterminant de leur engagement à s’équiper en dispositifs techniques de sélectivité", estime le texte.Le projet darrêté, émanant des services du secrétaire dEtat à la Mer Hervé Berville, affirme que les systèmes de caméras "sont susceptibles dapporter une contribution significative" à la lutte contre les captures accidentelles. "La visibilité apportée aux professionnels de la pêche sur plusieurs années est un facteur déterminant de leur engagement à séquiper en dispositifs techniques ou en système dobservation électronique à distance", justifie encore le texte dans son préambule. La période de fermeture envisagée ne concerne pas le golfe du Morbihan ni le bassin dArcachon.Le projet darrêté, émanant des services du secrétaire dEtat',
+          'Le projet darrêté, émanant des services du secrétaire dEtat à la Mer Hervé Berville...',
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 16.0,
-          ),
+          style: TextStyle(fontSize: 16.0),
+        ),
+      ),
+    );
+  }
+}
+
+class QCMPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("QCM Page"),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'This is the QCM Page',
+              style: TextStyle(fontSize: 24),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MyHomePage()),
+                  );
+              },
+              child: Text('Return to Main Page'),
+            ),
+          ],
         ),
       ),
     );
@@ -219,7 +291,7 @@ class _PaintScreenState extends State<PaintScreen> {
                 opacity: starOpacity,
                 duration: Duration(seconds: 1),
                 child: Image.asset(
-                  'assets/images/insta.jpg',
+                  'assets/images/whatsapp.jpg',
                   alignment: Alignment(0, -1),
                   width: 800,
                   height: 800,
